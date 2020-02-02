@@ -3,6 +3,7 @@ chardet==3.0.4
 Click==7.0
 future==0.18.2
 idna==2.8
+mercurial==5.2.2
 oauthlib==2.1.0
 pybitbucket==0.12.0
 requests==2.22.0
