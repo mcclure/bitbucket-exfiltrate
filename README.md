@@ -30,3 +30,11 @@ For a couple repos with git subrepos, I had to edit an hg/.hg/hgrc file and add 
 
     [subrepos]
     git:allowed = true
+
+## Andi-specific scripts
+
+I had a problem with spammers putting stuff in my BitBucket wikis. For this reason there is a script named wiki-tweak in the "andi-specific directory" that lists the unique names of wiki pages and creates scripts for hg removing pages matching certain patterns.
+
+# License
+
+The scripts in this directory are by Andi McClure and are available to you under [Creative Commons Zero](https://creativecommons.org/publicdomain/zero/1.0/legalcode), which is to say they are public domain.
