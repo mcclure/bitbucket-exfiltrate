@@ -1,4 +1,4 @@
-Script(s) to back up my BitBucket Mercurial repos
+BitBucket announced they were deleting their Mercurial repos. I had a bunch. I wrote these scripts to help me mass-export all my Mercurial repos off Bitbucket and back them up to my hard drive.
 
 # Usage
 
@@ -24,6 +24,11 @@ I ran this (it also asks for my Bitbucket password) to actually do the backup:
 
     python3 backup.py -u runhello -e "andi.m.mcclure@gmail.com" --info --outdir /Volumes/PATH/TO/BACKUPDIR
 
+I wanted to have a "flat" version of the backup with no mercurial, only the files, so then I ran this:
+
+	python3 archive.py --only public /Volumes/PATH/TO/BACKUPDIR /Volumes/PATH/TO/BACKUPDIR-FLAT > archivescript.bash
+	bash -e archivescript.bash
+
 ## Debugging
 
 For a couple repos with git subrepos, I had to edit an hg/.hg/hgrc file and add this at the end:
@@ -33,7 +38,7 @@ For a couple repos with git subrepos, I had to edit an hg/.hg/hgrc file and add 
 
 ## Andi-specific scripts
 
-I had a problem with spammers putting stuff in my BitBucket wikis. For this reason there is a script named wiki-tweak in the "andi-specific directory" that lists the unique names of wiki pages and creates scripts for hg removing pages matching certain patterns.
+I had a problem with spammers putting stuff in my BitBucket wikis. For this reason there is a script named wiki-tweak in the "andi-specific directory" that lists the unique names of wiki pages and creates scripts for hg removing pages matching certain patterns. There is also a directory named branch-check that prints the current and alternate heads of every repo dir. Both of these tools work on the directory output by backup.py.
 
 # License
 
