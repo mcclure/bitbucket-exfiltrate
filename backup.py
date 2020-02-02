@@ -90,9 +90,11 @@ def backup(info, raw, outdir, username, email, sort_access, sort_scm):
 				if has_wiki:
 					cloned = hgDownload(wikipath.encode('utf-8'), bytes("ssh://hg@bitbucket.org/{}/{}/wiki".format(username, name).encode('utf-8'))) or cloned
 
-				if cloned:
-					print("DID A CLONE!")
-					return
+				if info:
+					if cloned:
+						print("Successfully cloned")
+					else:
+						print("Successfully pulled")
 			else:
 				print("Warning: Did nothing for git repo {}".format(name))
 
