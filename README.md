@@ -40,10 +40,22 @@ For a couple repos with git subrepos, I had to edit an hg/.hg/hgrc file and add 
 
 After Bitbucket deleted the repos, I needed to create placeholders at the old BitBucket URLs so links I'd previously distributed wouldn't just be dead. Here's how I created my forwarding URLs.
 
-First off I needed to create dummy repos. There's a create-repos script that takes the names of the repos; I sourced these from the bitbucket backup directory I made:
+First off I needed to create dummy repos. There's a create-repos script that takes the names of the repos and creates them on the Bitbucket side; I sourced these from the bitbucket backup directory I made:
 
     ls /Volumes/PATH/TO/BACKUPDIR/public > reponames.txt
     python3 redirect/create-repos.py -u runhello -e "andi.m.mcclure@gmail.com" --names reponames.txt
+
+Then I needed to fill out the wikis of those repos:
+
+    python3 redirect/populate-wikis.py --prefix=https://github.com/mcclure/bitbucket-backup/tree/archive/repos --user=runhello /Volumes/PATH/TO/BACKUPDIR/public tmp > populatescript.bash
+    bash -e populatescript.bash
+
+This is a *little* more awkward then the other scripts, so notice these oddities:
+
+* "create-repos" takes the repo names as a file containing names whereas "populate-wikis" takes a directory as argument and does ls itself
+* With "populate-wikis" you should of course replace the "prefix" URL with whereever your new repos are; each repo name will be appended to the end of the URL
+* If you add a "redirect.txt" to the backup directory, next to "contents", "wiki" and "description.txt", the contents of that text file will be used instead of prefix/repo.
+* The Bitbucket API doesn't let you change the "landing page". So after the new repos are created, you will need to go into the settings page for **each one** and change the landing page to "wiki".
 
 ## Andi-specific scripts
 
