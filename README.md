@@ -45,17 +45,23 @@ First off I needed to create dummy repos. There's a create-repos script that tak
     ls /Volumes/PATH/TO/BACKUPDIR/public > reponames.txt
     python3 redirect/create-repos.py -u runhello -e "andi.m.mcclure@gmail.com" --names reponames.txt
 
-Then I needed to fill out the wikis of those repos:
+Then I needed to fill out the landing pages (the README.MDs) of those repos:
 
-    python3 redirect/populate-wikis.py --prefix=https://github.com/mcclure/bitbucket-backup/tree/archive/repos --user=runhello /Volumes/PATH/TO/BACKUPDIR/public tmp > populatescript.bash
+    python3 redirect/populate.py --prefix=https://github.com/mcclure/bitbucket-backup/tree/archive/repos --user=runhello /Volumes/PATH/TO/BACKUPDIR/public tmp > populatescript.bash
     bash -e populatescript.bash
 
 This is a *little* more awkward then the other scripts, so notice these oddities:
 
-* "create-repos" takes the repo names as a file containing names whereas "populate-wikis" takes a directory as argument and does ls itself
-* With "populate-wikis" you should of course replace the "prefix" URL with whereever your new repos are; each repo name will be appended to the end of the URL
+* "create-repos" takes the repo names as a file containing names whereas "populate" takes a directory as argument and does ls itself
+* With "populate" you should of course replace the "prefix" URL with whereever your new repos are; each repo name will be appended to the end of the URL
 * If you add a "redirect.txt" to the backup directory, next to "contents", "wiki" and "description.txt", the contents of that text file will be used instead of prefix/repo.
-* The Bitbucket API doesn't let you change the "landing page". So after the new repos are created, you will need to go into the settings page for **each one** and change the landing page to "wiki".
+* By default, populate.py and create-repos.py will create both a README.MD and a wiki (we could skip the README.MD but unfortunately BitBucket no longer lets wikis be landing pages). If you want to skip the wiki, pass `--nowiki`.
+
+If you mess something up while running these scripts, you may find the included mass delete script useful:
+
+    python3 redirect/delete-repos.py -u runhello -e "andi.m.mcclure@gmail.com" --names reponames.txt
+
+Because this last script is dangerous, an `--i-know-what-this-does` argument is required.
 
 ## Andi-specific scripts
 
