@@ -9,11 +9,14 @@ import os
 import os.path
 import sys
 
-@click.command(help="Takes a list of newline-separated names, creates Bitbucket repo for each one with wiki but no issues or PRs")
+@click.command(help="Takes a list of newline-separated names, DELETES Bitbucket repo for each one")
 @click.option('--username', '-u', type=click.STRING, required=True, help="Username to log in with")
 @click.option('--email', '-e', type=click.STRING, required=True, help="Email account associated with username to log in with")
 @click.option('--names', type=click.File('r'), required=True, help="Newline-separated list")
-def create(username, email, names):
+@click.option('--i-know-what-this-does', count=True, required=True, help="Include this flag so I know this isn't an accident")
+def delete(username, email, names, i_know_what_this_does):
+	if not i_know_what_this_does:
+		raise click.ClickException("Must include --i-know-what-this-does flag")
 	password = getpass()
 	bitbucket = Client(
 	    BasicAuthenticator(
@@ -25,27 +28,25 @@ def create(username, email, names):
 	print("IN")
 	for line in names:
 		name = line.rstrip()
-		print("Creating: '%s'" % (name))
-		payload = RepositoryPayload({'name': name, 'is_private':False, 'fork_policy': RepositoryForkPolicy.ALLOW_FORKS, 'description': "This repository has moved. See wiki for new link.", 'has_issues':False, 'has_wiki':True})
+		print("Deleting: %s" % (name))
 		try:
-			Repository.create(payload, name.lower(), None, bitbucket) # Returns repo but it isn't used. Notice lowercase "slug"
+			repo = Repository.find_repository_by_name_and_owner(name, owner=username, client=bitbucket)
+			repo.delete()
 		except BadRequestError as e:
 			errorHandled = False
 			if e.type == "error" and hasattr(e, "error"):
 				er = e.error
 				if "message" in er:
 					errorMessage = er["message"]
-					print("Error creating repo %s: %s" % (name, errorMessage))
-				if "fields" in er:
-					fields = er["fields"]
-					if "name" in fields:
-						errorName = fields["name"][0]
-						if errorName == "You already have a repository with this name.":
-							print("Skipping %s" % (name))
-							errorHandled = True
+					print("Error deleting repo %s: %s" % (name, errorMessage))
 			if not errorHandled:
+				raise e
+		except HTTPError as e:
+			if str(e).startswith("404 Client"): # THANKS FOR PARSING THE ERROR, MYSTERY ERROR CLASS
+				print("Error deleting repo %s: %s" % (name, e)) # THAT WAS SARCASM, BY THE WAY
+			else:
 				raise e
 
 		print()
 
-create()
+delete()

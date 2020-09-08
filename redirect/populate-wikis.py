@@ -3,6 +3,7 @@ import os.path
 import click
 import sys
 import re
+import sys
 
 @click.command(help="Takes the backup/public directory created by backup.py and a place to store a temp directory, outputs the git commands to create wikis for each repo in the backup")
 @click.argument('indir', type=click.Path(file_okay=False))
@@ -15,6 +16,12 @@ def populate(indir, outdir, prefix, user):
 		prefix += "/"
 
 	for repo in os.listdir(indir): # Repo names
+		if repo.find(".") == 0:
+			sys.stderr.write("Skipping invisible: '%s'\n" % repo)
+			continue
+		if not os.path.isdir(os.path.join(indir, repo)):
+			sys.stderr.write("Skipping file: '%s'\n" % repo)
+			continue
 		outrepo = os.path.join(outdir, repo)
 		os.makedirs(outrepo, mode=0o777, exist_ok=True)
 		
