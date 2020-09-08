@@ -10,8 +10,8 @@ import sys
 @click.argument('outdir', type=click.STRING)
 @click.option('--user', type=click.STRING, required=True, help="Your bitbucket username")
 @click.option('--prefix', type=click.STRING, required=True, help="URL prefix for new repos")
-
-def populate(indir, outdir, prefix, user):
+@click.option('--no-wiki', count=True, help="Don't populate wiki")
+def populate(indir, outdir, prefix, user, no_wiki):
 	if not prefix.endswith("/"):
 		prefix += "/"
 
@@ -22,8 +22,6 @@ def populate(indir, outdir, prefix, user):
 		if not os.path.isdir(os.path.join(indir, repo)):
 			sys.stderr.write("Skipping file: '%s'\n" % repo)
 			continue
-		outrepo = os.path.join(outdir, repo)
-		os.makedirs(outrepo, mode=0o777, exist_ok=True)
 		
 		redirect = None
 		description = None
@@ -44,15 +42,28 @@ def populate(indir, outdir, prefix, user):
 		if description and not (description.endswith(".") or description.endswith("!") or description.endswith("?")):
 			description += "."
 		
-		with open(os.path.join(outrepo, "Home.md"), "w") as f:
-			f.write('# %s\n\n%s%s**This repository has [moved](%s).**\n' % (repo, description if description is not None else "", "\n\n" if description else "", redirect))
+		for is_wiki in range(2):
+			if is_wiki and no_wiki:
+				break
 
-		fullpath = os.path.abspath(outrepo)
-		print('pushd "%s"' % (fullpath))
-		print('git init .')
-		print('git add Home.md')
-		print('git commit -m "Initial commit created by script"')
-		print('git push -f git@bitbucket.org:%s/%s.git/wiki master' % (user, repo))
-		print('popd')
+			outrepo = os.path.join(outdir, repo)
+			if is_wiki:
+				outrepo += "-wiki"
+			os.makedirs(outrepo, mode=0o777, exist_ok=True)
+
+			filename = "Home.md" if is_wiki else "README.md"
+			with open(os.path.join(outrepo, filename), "w") as f:
+				f.write('# %s\n\n%s%s**This repository has [moved](%s).**\n' % (repo, description if description is not None else "", "\n\n" if description else "", redirect))
+
+			fullpath = os.path.abspath(outrepo)
+			print('pushd "%s"' % (fullpath))
+			print('git init .')
+			print('git add %s' % (filename))
+			print('git commit -m "Initial commit created by script"')
+			if is_wiki:
+				print('git push -f git@bitbucket.org:%s/%s.git/wiki master' % (user, repo))
+			else:
+				print('git push -f git@bitbucket.org:%s/%s.git master' % (user, repo))
+			print('popd')
 
 populate()

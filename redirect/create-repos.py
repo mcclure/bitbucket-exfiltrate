@@ -13,7 +13,8 @@ import sys
 @click.option('--username', '-u', type=click.STRING, required=True, help="Username to log in with")
 @click.option('--email', '-e', type=click.STRING, required=True, help="Email account associated with username to log in with")
 @click.option('--names', type=click.File('r'), required=True, help="Newline-separated list")
-def create(username, email, names):
+@click.option('--no-wiki', count=True, help="Don't create wiki")
+def create(username, email, names, no_wiki):
 	password = getpass()
 	bitbucket = Client(
 	    BasicAuthenticator(
@@ -26,7 +27,7 @@ def create(username, email, names):
 	for line in names:
 		name = line.rstrip()
 		print("Creating: '%s'" % (name))
-		payload = RepositoryPayload({'name': name, 'is_private':False, 'fork_policy': RepositoryForkPolicy.ALLOW_FORKS, 'description': "This repository has moved. See wiki for new link.", 'has_issues':False, 'has_wiki':True})
+		payload = RepositoryPayload({'name': name, 'is_private':False, 'fork_policy': RepositoryForkPolicy.ALLOW_FORKS, 'description': "This repository has moved. See README for new link.", 'has_issues':False, 'has_wiki':not no_wiki})
 		try:
 			Repository.create(payload, name.lower(), None, bitbucket) # Returns repo but it isn't used. Notice lowercase "slug"
 		except BadRequestError as e:

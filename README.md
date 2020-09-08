@@ -12,6 +12,8 @@ I suggest using a virtualenv for this script. Before first running the script, r
 
 ## Running
 
+*(Because by the time I'm writing these words the Mercurial repos these first scripts were written to export have all been deleted, you probably want to skip to "Forwarding".)*
+
 I'm on a mac, so I had to run this first so I wouldn't have to keep entering my ssh password:
 
     ssh-add -K ~/.ssh/id_rsa
@@ -55,7 +57,7 @@ This is a *little* more awkward then the other scripts, so notice these oddities
 * "create-repos" takes the repo names as a file containing names whereas "populate" takes a directory as argument and does ls itself
 * With "populate" you should of course replace the "prefix" URL with whereever your new repos are; each repo name will be appended to the end of the URL
 * If you add a "redirect.txt" to the backup directory, next to "contents", "wiki" and "description.txt", the contents of that text file will be used instead of prefix/repo.
-* By default, populate.py and create-repos.py will create both a README.MD and a wiki (we could skip the README.MD but unfortunately BitBucket no longer lets wikis be landing pages). If you want to skip the wiki, pass `--nowiki`.
+* By default, populate.py and create-repos.py will create both a README.MD and a wiki (we could skip the README.MD but unfortunately BitBucket no longer lets wikis be landing pages). If you want to skip the wiki, pass `--no-wiki`.
 
 If you mess something up while running these scripts, you may find the included mass delete script useful:
 
