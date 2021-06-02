@@ -11,5 +11,5 @@ requests-oauthlib==0.8.0
 simplejson==3.17.0
 six==1.14.0
 uritemplate==0.6
-urllib3==1.25.8
+urllib3==1.26.5
 voluptuous==0.11.7
